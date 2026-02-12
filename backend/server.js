@@ -28,6 +28,33 @@ async function initDB() {
     }
 }
 
+app.delete("/api/transactions/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const idNum = parseInt(id);
+    if (isNaN(idNum)) {
+      return res.status(400).json({ message: "Invalid transaction id" });
+    }
+
+    const result = await sql`
+      DELETE FROM transactions WHERE id = ${idNum} RETURNING *
+    `;
+
+    if (result.length === 0) {
+      return res.status(404).json({ message: "Transaction not found" });
+    }
+
+    return res.status(200).json({ message: "Transaction deleted successfully" });
+  } catch (error) {
+    console.error("Delete transaction failed:", error);
+    if (!res.headersSent) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  }
+});
+
+
 app.post("/api/transactions", async (req, res) => {
   try {
     const { title, amount, category, user_id } = req.body;
