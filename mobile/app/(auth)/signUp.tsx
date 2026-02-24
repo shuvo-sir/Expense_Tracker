@@ -1,12 +1,13 @@
 import { useSignUp } from '@clerk/clerk-expo'
 import { Link, useRouter } from 'expo-router'
-import * as React from 'react'
+
 import { TextInput, Text, View, TouchableOpacity } from 'react-native'
 import {styles} from '@/assets/styles/auth.styles'
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '@/constants/colors'
 import { Image } from 'expo-image'
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
+import { useState } from 'react'
 
 
 
@@ -14,11 +15,11 @@ export default function Page() {
   const { isLoaded, signUp, setActive } = useSignUp()
   const router = useRouter()
 
-  const [emailAddress, setEmailAddress] = React.useState('')
-  const [password, setPassword] = React.useState('')
-  const [pendingVerification, setPendingVerification] = React.useState(false)
-  const [code, setCode] = React.useState('')
-  const [error, setError] = React.useState('')
+  const [emailAddress, setEmailAddress] = useState('')
+  const [password, setPassword] = useState('')
+  const [pendingVerification, setPendingVerification] = useState(false)
+  const [code, setCode] = useState('')
+  const [error, setError] = useState('')
 
   // Handle submission of sign-up form
   const onSignUpPress = async () => {
@@ -37,10 +38,16 @@ export default function Page() {
       // Set 'pendingVerification' to true to display second form
       // and capture code
       setPendingVerification(true)
-    } catch (err) {
-      // See https://clerk.com/docs/guides/development/custom-flows/error-handling
-      // for more info on error handling
-      console.error(JSON.stringify(err, null, 2))
+    } catch (err: any) {
+        const clerkError = err?.errors?.[0]
+
+        if (clerkError?.code === 'form_identifier_exists') {
+          setError('An account with this email already exists.')
+        } else if (clerkError?.longMessage) {
+          setError(clerkError.longMessage)
+        } else {
+          setError('Failed to create account. Please try again.')
+        }
     }
   }
 
