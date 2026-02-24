@@ -12,7 +12,7 @@ export const styles = StyleSheet.create({
   illustration: {
     height: 310,
     width: 300,
-    resizeMode: "contain",
+    contentFit: "contain",
   },
   title: {
     fontSize: 32,
@@ -75,6 +75,11 @@ export const styles = StyleSheet.create({
     color: COLORS.text,
     marginBottom: 20,
     textAlign: "center",
+  },
+  verificationDescription: {
+    fontSize: 14,
+    marginBottom: 16,
+    opacity: 0.8,
   },
   verificationInput: {
     backgroundColor: COLORS.white,
