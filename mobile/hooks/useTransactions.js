@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from 'react'; // ✅ make sure useCallback is here
 import { Alert } from 'react-native';
 
-const API_URL = 'https://localhost:5001/api'; // Replace with your actual API URL
+const API_URL = 'https://expense-tracker-2-kdar.onrender.com/api'; // Replace with your actual API URL
 
 export const useTransactions = (userId) => {
     // Here you can implement the logic to fetch transactions for the given userId

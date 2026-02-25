@@ -4,7 +4,7 @@ import { ThemedView } from '@/components/themed-view'
 import { useTransactions } from "@/hooks/useTransactions.js"
 import { SignedIn, SignedOut, useSession, useUser } from '@clerk/clerk-expo'
 import { Link } from 'expo-router'
-import { useState, useEffect, useCallback } from 'react'; // ✅ make sure useCallback is here
+import { useEffect } from 'react'; // ✅ make sure useCallback is here
 import { StyleSheet } from 'react-native'
 
 export default function Page() {
