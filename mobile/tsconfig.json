@@ -13,5 +13,5 @@
     ".expo/types/**/*.ts",
     "expo-env.d.ts",
     "app/_layout.tsx"
-, "app/(auth)/signIn.jsx"  ]
+, "app/(auth)/signIn.jsx", "hooks/useTransactions.js"  ]
 }

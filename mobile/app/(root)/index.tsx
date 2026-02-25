@@ -1,8 +1,10 @@
 import { SignOutButton } from "@/components/SignOutButton"
 import { ThemedText } from '@/components/themed-text'
 import { ThemedView } from '@/components/themed-view'
+import { useTransactions } from "@/hooks/useTransactions.js"
 import { SignedIn, SignedOut, useSession, useUser } from '@clerk/clerk-expo'
 import { Link } from 'expo-router'
+import { useState, useEffect, useCallback } from 'react'; // ✅ make sure useCallback is here
 import { StyleSheet } from 'react-native'
 
 export default function Page() {
@@ -13,6 +15,15 @@ export default function Page() {
   // Learn more: https://clerk.com/docs/guides/configure/session-tasks
   const { session } = useSession()
   console.log(session?.currentTask)
+
+  const {transactions,isLoading,loadData,summary,deleteTransaction} = useTransactions(user?.id)
+
+
+  useEffect(() => {
+    loadData()
+  },[loadData]);
+  console.log("Transactions", transactions);
+  console.log("Summary", summary);
 
   return (
     <ThemedView style={styles.container}>
