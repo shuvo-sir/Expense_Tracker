@@ -82,13 +82,20 @@ export default function Page() {
         // complete further steps.
         console.error(JSON.stringify(signUpAttempt, null, 2))
       }
-    } catch (err) {
-      // See https://clerk.com/docs/guides/development/custom-flows/error-handling
-      // for more info on error handling
-      console.error(JSON.stringify(err, null, 2))
+    } catch (err: any) {
+    const clerkError = err?.errors?.[0]
+
+    if (clerkError?.code === 'form_code_incorrect') {
+      setError('The verification code is incorrect.')
+    } else if (clerkError?.code === 'form_code_expired') {
+      setError('The verification code has expired. Please request a new one.')
+    } else if (clerkError?.longMessage) {
+      setError(clerkError.longMessage)
+    } else {
+      setError('Verification failed. Please try again.')
     }
   }
-
+}
   if (pendingVerification) {
     return (
       <View style={styles.verificationContainer}>

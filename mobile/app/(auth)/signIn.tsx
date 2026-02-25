@@ -163,7 +163,7 @@ export default function Page() {
           source={require('@/assets/images/revenue-i4.png')}
           style={styles.illustration}
         />
-        <Text style={styles.title}>Sign In</Text>
+        <Text style={styles.title}>Welcome  Back</Text>
 
         {error ? (
           <View style={styles.errorBox}>
