@@ -1,14 +1,18 @@
 import { SignOutButton } from "@/components/SignOutButton"
-import { ThemedText } from '@/components/themed-text'
-import { ThemedView } from '@/components/themed-view'
 import { useTransactions } from "@/hooks/useTransactions.js"
 import { SignedIn, SignedOut, useSession, useUser } from '@clerk/clerk-expo'
-import { Link } from 'expo-router'
+import { Link, router, useRouter } from 'expo-router'
 import { useEffect } from 'react'; // ✅ make sure useCallback is here
-import { StyleSheet,Text } from 'react-native'
+import PageLoading from '@/components/PageLoading'
+import { View, Text, TouchableOpacity } from "react-native";
+import { styles } from "@/assets/styles/home.styles";
+import { Image } from "expo-image";
+import { Ionicons } from "@expo/vector-icons";
+import { BalanceCard } from "@/components/BalanceCard";
 
 export default function Page() {
   const { user } = useUser()
+  const router = useRouter();
 
   // If your user isn't appearing as signed in,
   // it's possible they have session tasks to complete.
@@ -22,37 +26,41 @@ export default function Page() {
   useEffect(() => {
     loadData()
   },[loadData]);
-  console.log("Transactions", transactions);
-  console.log("Summary", summary);
 
+if (isLoading) return <PageLoading />
   return (
-    <ThemedView style={styles.container}>
-      <ThemedText type="title">Welcome!</ThemedText>
-      {/* Show the sign-in and sign-up buttons when the user is signed out */}
-      <SignedOut>
-        <Link href="/(auth)/signIn">
-          <ThemedText>Sign in</ThemedText>
-        </Link>
-        <Link href="/(auth)/signUp">
-          <ThemedText>Sign up</ThemedText>
-        </Link>
-      </SignedOut>
-      {/* Show the sign-out button when the user is signed in */}
-      <SignedIn>
-        <ThemedText>Hello {user?.emailAddresses[0].emailAddress}</ThemedText>
-        <Text>Income: {summary?.income}</Text>
-        <Text>Expense: {summary?.expenses}</Text>
-        <Text>Balance: {summary?.balance}</Text>
-        <SignOutButton />
-      </SignedIn>
-    </ThemedView>
+    <View style={styles.container}>
+      <View style={styles.content}>
+        {/* Header */}
+        <View style={styles.header}>
+          {/* Left */}
+          <View style={styles.headerLeft}>
+            <Image
+              source={require('@/assets/images/logo.png')}
+              style={styles.headerLogo}
+              contentFit="contain"
+            />
+            <View style={styles.welcomeContainer}>
+              <Text style={styles.welcomeText}>Welcome</Text>
+              <Text style={styles.usernameText}>{user?.emailAddresses[0]?.emailAddress.split('@')[0]}</Text>
+            </View>
+          </View>
+          {/* Right */}
+          <View style={styles.headerRight}>
+            <TouchableOpacity style={styles.addButton} onPress={() => router.push("/signUp")}>
+              <Ionicons name="add-circle" size={24} color="#fff" />
+              <Text style={styles.addButtonText}>Add</Text>
+            </TouchableOpacity>
+            <SignOutButton />
+          </View>
+        </View>
+        <BalanceCard summary={summary} />
+
+        <View style={styles.transactionsHeaderContainer}>
+          <Text style={styles.sectionTitle}>Recent Transactions</Text>
+        </View>
+      </View>
+    </View>
   )
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    gap: 16,
-  },
-})
