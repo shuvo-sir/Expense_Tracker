@@ -5,7 +5,7 @@ import { useTransactions } from "@/hooks/useTransactions.js"
 import { SignedIn, SignedOut, useSession, useUser } from '@clerk/clerk-expo'
 import { Link } from 'expo-router'
 import { useEffect } from 'react'; // ✅ make sure useCallback is here
-import { StyleSheet } from 'react-native'
+import { StyleSheet,Text } from 'react-native'
 
 export default function Page() {
   const { user } = useUser()
@@ -40,6 +40,9 @@ export default function Page() {
       {/* Show the sign-out button when the user is signed in */}
       <SignedIn>
         <ThemedText>Hello {user?.emailAddresses[0].emailAddress}</ThemedText>
+        <Text>Income: {summary?.income}</Text>
+        <Text>Expense: {summary?.expenses}</Text>
+        <Text>Balance: {summary?.balance}</Text>
         <SignOutButton />
       </SignedIn>
     </ThemedView>
