@@ -2,17 +2,21 @@ import { SignOutButton } from "@/components/SignOutButton"
 import { useTransactions } from "@/hooks/useTransactions.js"
 import { SignedIn, SignedOut, useSession, useUser } from '@clerk/clerk-expo'
 import { Link, router, useRouter } from 'expo-router'
-import { useEffect } from 'react'; // ✅ make sure useCallback is here
+import { useEffect, useState } from 'react'; // ✅ make sure useCallback is here
 import PageLoading from '@/components/PageLoading'
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, FlatList, Alert, RefreshControl } from "react-native";
 import { styles } from "@/assets/styles/home.styles";
 import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
 import { BalanceCard } from "@/components/BalanceCard";
+import { TransactionItem } from "@/components/TransactionItem";
+import NoTransactionFound from "@/components/NoTransactionFound";
+
 
 export default function Page() {
   const { user } = useUser()
   const router = useRouter();
+    const [refreshing, setRefreshing] = useState(false);
 
   // If your user isn't appearing as signed in,
   // it's possible they have session tasks to complete.
@@ -27,7 +31,32 @@ export default function Page() {
     loadData()
   },[loadData]);
 
-if (isLoading) return <PageLoading />
+  console.log("userId",user?.id)
+    const onRefresh = async () => {
+    setRefreshing(true);
+    await loadData();
+    setRefreshing(false);
+    }
+
+  const handleDelete = (id: string) => {
+    Alert.alert(
+      "Delete Transaction",
+      "Are you sure you want to delete this transaction?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel"
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => deleteTransaction(id)
+        }
+      ]
+    )
+  }
+
+if (isLoading && !refreshing) return <PageLoading />
   return (
     <View style={styles.container}>
       <View style={styles.content}>
@@ -60,6 +89,18 @@ if (isLoading) return <PageLoading />
           <Text style={styles.sectionTitle}>Recent Transactions</Text>
         </View>
       </View>
+
+      <FlatList 
+        style={styles.transactionsList}
+        contentContainerStyle={styles.transactionsListContent}
+        data = {transactions}
+        renderItem={({item}) => (
+          <TransactionItem item={item} onDelete={handleDelete}/>
+        )}
+        ListEmptyComponent={<NoTransactionFound/>}
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>}
+      />
     </View>
   )
 }
