@@ -2,16 +2,19 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
-    "baseUrl": ".", 
+    "baseUrl": ".",
     "paths": {
       "@/*": ["./*"]
-    }
+    },
+    "jsx": "react-jsx",
+    "moduleResolution": "bundler"
   },
   "include": [
     "**/*.ts",
     "**/*.tsx",
+    "**/*.js",
+    "**/*.jsx",
     ".expo/types/**/*.ts",
-    "expo-env.d.ts",
-    "app/_layout.tsx"
-, "app/(auth)/signIn.jsx", "hooks/useTransactions.js"  ]
+    "expo-env.d.ts"
+  ]
 }
