@@ -1,6 +1,7 @@
 import { useUser } from "@clerk/clerk-expo";
 import { Redirect } from "expo-router";
 import { Stack } from "expo-router/stack";
+import 'react-native-gesture-handler';
 
 export default function Layout() {
   const { isSignedIn, isLoaded } = useUser();

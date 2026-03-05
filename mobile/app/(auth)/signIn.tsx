@@ -1,4 +1,4 @@
-import { useSignIn } from "@clerk/clerk-expo";
+import { isClerkAPIResponseError, useSignIn } from "@clerk/clerk-expo";
 import { Link, useRouter } from "expo-router";
 import { Text, TextInput, TouchableOpacity, View, Image } from "react-native";
 import { useState } from "react";
@@ -16,35 +16,56 @@ export default function Page() {
   const [error, setError] = useState("");
 
   // Handle the submission of the sign-in form
-  const onSignInPress = async () => {
-    if (!isLoaded) return;
 
-    // Start the sign-in process using the email and password provided
-    try {
-      const signInAttempt = await signIn.create({
-        identifier: emailAddress,
-        password,
-      });
+const onSignInPress = async () => {
+  if (!isLoaded) return;
+  setError(""); // Clear previous errors
 
-      // If sign-in process is complete, set the created session as active
-      // and redirect the user
-      if (signInAttempt.status === "complete") {
-        await setActive({ session: signInAttempt.createdSessionId });
-        router.replace("/");
-      } else {
-        // If the status isn't complete, check why. User might need to
-        // complete further steps.
-        console.error(JSON.stringify(signInAttempt, null, 2));
-      }
-    } catch (err: any) {
-      if (err.errors?.[0]?.code === "form_password_incorrect") {
-        setError("Password is incorrect. Please try again.");
-      } else {
-        setError("An error occurred. Please try again.");
-      }
+  try {
+    const signInAttempt = await signIn.create({
+      identifier: emailAddress,
+      password,
+    });
+
+    if (signInAttempt.status === "complete") {
+      await setActive({ session: signInAttempt.createdSessionId });
+      router.replace("/");
+    } else {
+      console.log("Status not complete:", signInAttempt.status);
     }
-  };
-
+  } catch (err: any) {
+    // Check if the error comes from Clerk's API
+    if (isClerkAPIResponseError(err)) {
+      const code = err.errors[0]?.code;
+      
+      switch (code) {
+        case "form_identifier_not_found":
+          setError("We couldn't find an account with that email.");
+          break;
+        case "form_password_incorrect":
+          setError("The password you entered is incorrect.");
+          break;
+        case "user_locked":
+          setError("Your account is temporarily locked due to too many failed attempts. Try again in a few minutes.");
+          break;
+        case "form_identifier_format_invalid":
+          setError("Please enter a valid email address.");
+          break;
+        case "network_error":
+          setError("No internet connection. Please check your network and try again.");
+          break;
+        default:
+          // Fallback to the message Clerk provides if we don't have a custom one
+          setError(err.errors[0]?.message || "Something went wrong. Please try again.");
+          break;
+      }
+    } else {
+      setError("An unexpected error occurred. Please try again later.");
+    }
+    
+    console.error(JSON.stringify(err, null, 2));
+  }
+};
   return (
     <KeyboardAwareScrollView
       style={{ flex: 1 }}
